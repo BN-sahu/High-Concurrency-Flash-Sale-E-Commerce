@@ -13,7 +13,9 @@ const EMOJI_TO_IMG: Record<string, string> = {
   "👕": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80", // Tee
 };
 
-export default function CheckoutPage() {
+import { Suspense } from "react";
+
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("sessionId");
 
@@ -296,5 +298,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center">Loading checkout...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
