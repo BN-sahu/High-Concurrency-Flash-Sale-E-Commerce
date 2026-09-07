@@ -1,0 +1,20 @@
+{
+  "name": "@flash-sale/database",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.0",
+    "mongoose": "^8.1.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.9.0",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: flash-sale-project
+  namespace: argocd
+  description: Project for Flash Sale E-Commerce Platform
+spec:
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: flash-sale
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
