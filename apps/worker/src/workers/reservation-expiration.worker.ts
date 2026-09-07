@@ -1,5 +1,5 @@
 import { getPrisma } from '@flash-sale/database';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@flash-sale/database';
 
 /**
  * Reservation expiration worker: releases expired reservations back to inventory.
