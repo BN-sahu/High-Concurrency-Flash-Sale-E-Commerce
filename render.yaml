@@ -1,0 +1,74 @@
+services:
+  # ==========================================
+  # 1. Backend API Service
+  # ==========================================
+  - type: web
+    name: flash-sale-api
+    env: docker
+    dockerContext: .
+    dockerfilePath: docker/Dockerfile.api
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: FRONTEND_URL
+        value: "https://flash-sale-web.onrender.com" # Default render domain for the frontend below
+      
+      # The following secrets will need to be provided in the Render Dashboard securely
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+
+  # ==========================================
+  # 2. Frontend (Next.js) Service
+  # ==========================================
+  - type: web
+    name: flash-sale-web
+    env: docker
+    dockerContext: .
+    dockerfilePath: docker/Dockerfile.web
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: NEXT_PUBLIC_API_URL
+        value: "https://flash-sale-api.onrender.com" # Maps to the API service above
+
+  # ==========================================
+  # 3. Background Worker Service
+  # ==========================================
+  - type: worker
+    name: flash-sale-worker
+    env: docker
+    dockerContext: .
+    dockerfilePath: docker/Dockerfile.worker
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      
+      # The worker shares these databases with the API
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
