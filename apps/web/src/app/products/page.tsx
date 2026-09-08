@@ -3,6 +3,15 @@
 import { useState, useEffect } from "react";
 import { Zap, ChevronRight, Star } from "lucide-react";
 
+const EMOJI_TO_IMG: Record<string, string> = {
+  "🔥": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
+  "🎮": "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80",
+  "🥽": "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=800&q=80",
+  "⌚": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800&q=80",
+  "🚗": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80",
+  "👕": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
+};
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,27 +66,41 @@ export default function ProductsPage() {
               <a
                 key={product.id}
                 href={`/products/${product.id}`}
-                className="glass-card p-6 interactive group cursor-pointer"
+                className="glass-card overflow-hidden flex flex-col interactive group cursor-pointer"
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
                 style={{
                   boxShadow: isHovered ? '0 0 30px var(--primary-glow)' : 'none',
                 }}
               >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex gap-2">
-                    <span className="badge badge-primary">{discount}% OFF</span>
+                {/* Product Image - Full Bleed */}
+                <div className="relative w-full aspect-square bg-[var(--surface)] overflow-hidden">
+                  <div className="absolute top-4 left-4 z-10 flex gap-2">
+                    <span className="px-3 py-1 text-sm font-bold bg-[var(--primary)] text-white rounded-full shadow-[0_0_15px_rgba(139,92,246,0.5)] tracking-wide">
+                      {discount}% OFF
+                    </span>
                     {isLowStock && (
-                      <span className="badge badge-danger">Low Stock</span>
+                      <span className="px-3 py-1 text-sm font-bold bg-[var(--danger)] text-white rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                        Low Stock
+                      </span>
                     )}
                   </div>
+                  
+                  {EMOJI_TO_IMG[product.imageUrl] || product.imageUrl?.startsWith('http') ? (
+                    <img 
+                      src={EMOJI_TO_IMG[product.imageUrl] || product.imageUrl} 
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-7xl group-hover:scale-110 transition-transform duration-500">
+                      {product.imageUrl || "🔥"}
+                    </div>
+                  )}
                 </div>
 
-                {/* Product Image Placeholder */}
-                <div className="w-full aspect-square rounded-xl bg-[var(--surface)] flex items-center justify-center mb-4 text-6xl group-hover:scale-105 transition-transform duration-300">
-                  {product.imageUrl || "🔥"}
-                </div>
+                {/* Content */}
+                <div className="p-5 flex flex-col flex-1">
 
                 {/* Product Info */}
                 <h2 className="font-semibold text-lg mb-2 line-clamp-1">{product.name}</h2>
@@ -98,9 +121,9 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Stock Indicator */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-[var(--text-muted)] mb-1">
-                    <span>{available} left</span>
+                <div className="mb-5 mt-auto">
+                  <div className="flex justify-between text-sm font-medium text-[var(--text-muted)] mb-2">
+                    <span className={isLowStock ? 'text-[var(--danger)] font-bold' : ''}>{available} left</span>
                     <span>{Math.round((available / total) * 100)}% remaining</span>
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-[var(--surface)]">
@@ -131,6 +154,7 @@ export default function ProductsPage() {
                   <Zap className="w-4 h-4" />
                   {available === 0 ? "Sold Out" : isLowStock ? "Grab Now!" : "Buy Now"}
                 </button>
+                </div>
               </a>
             );
           })}
