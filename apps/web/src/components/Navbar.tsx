@@ -12,15 +12,15 @@ export function Navbar() {
     let isActive = path === "/" ? pathname === "/" : pathname.startsWith(path);
     if (path === "/products" && pathname.startsWith("/checkout")) isActive = true;
 
-    return `relative text-sm font-medium transition-colors py-1 ${
+    return `text-sm font-medium transition-colors px-3 py-1.5 rounded-lg ${
       isActive 
-        ? "text-[var(--primary)] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-[var(--primary)] after:rounded-full" 
-        : "text-[var(--text-muted)] hover:text-[var(--foreground)]"
+        ? "text-white bg-[var(--surface-raised)] border border-[var(--card-border)] shadow-[0_0_10px_rgba(139,92,246,0.3)]" 
+        : "text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface)]"
     }`;
   };
 
   return (
-    <nav className="sticky top-0 z-50 glass-card border-b border-[var(--card-border)] backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 w-full z-50 glass-card border-b border-[var(--card-border)] backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
@@ -31,10 +31,10 @@ export function Navbar() {
               <span className="text-xl font-bold gradient-text">FlashDrop</span>
             </a>
 
-            <div className="hidden md:flex items-center gap-6">
-              <a href="/" className={getLinkClass("/")}>Home</a>
-              <a href="/products" className={getLinkClass("/products")}>Products</a>
-              <a href="/orders" className={getLinkClass("/orders")}>Orders</a>
+            <div className="hidden md:flex items-center gap-4">
+              <a href="/" className={getLinkClass("/")} aria-current={pathname === "/" ? "page" : undefined}>Home</a>
+              <a href="/products" className={getLinkClass("/products")} aria-current={pathname.startsWith("/products") || pathname.startsWith("/checkout") ? "page" : undefined}>Products</a>
+              <a href="/orders" className={getLinkClass("/orders")} aria-current={pathname.startsWith("/orders") ? "page" : undefined}>Orders</a>
             </div>
           </div>
 
