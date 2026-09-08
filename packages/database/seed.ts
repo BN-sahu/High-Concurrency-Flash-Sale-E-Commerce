@@ -15,9 +15,15 @@ const MOCK_PRODUCTS = [
 
 async function main() {
   console.log("Connecting to MongoDB...");
-  // Connect to MongoDB Atlas (we need to load the URL from .env, but it's passed here or we can use the environment variable directly)
-  const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/flashsale";
+    const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/flashsale";
   await mongoose.connect(mongoUri);
+  console.log("Wiping database...");
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.inventory.deleteMany();
+  await prisma.product.deleteMany();
+  await ProductCatalog.deleteMany({});
+  console.log("Database wiped.");
 
   console.log("Seeding database...");
   for (const p of MOCK_PRODUCTS) {
