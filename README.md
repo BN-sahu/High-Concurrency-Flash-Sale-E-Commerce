@@ -1,91 +1,69 @@
-# High-Concurrency Flash Sale E-Commerce Platform
+# ⚡ FlashDrop — High-Concurrency E-Commerce
 
-A production-grade, distributed e-commerce platform built to handle extreme concurrency (1000+ simultaneous users) during flash sales with a strict **zero overselling** guarantee.
+A production-ready flash sale platform architected to handle massive traffic spikes and extreme concurrent checkout attempts without ever overselling inventory. 
 
-## Architecture
+**Live Demo:** [https://high-concurrency-flash-sale-ecommerce.netlify.app]
+**API Backend:** [https://flash-sale-backend-y6h6.onrender.com]
 
-This platform utilizes a robust distributed architecture to ensure atomic transactions, high performance, and enterprise-grade reliability:
+## 🏗️ Architecture & Engineering
 
-- **Frontend**: Next.js 14+ (App Router), React 18, Tailwind CSS, Glassmorphism UI
-- **Backend API**: Node.js, Express, TypeScript (Modular Monolith)
-- **Background Workers**: BullMQ for async processing (payments, fulfillments, expirations)
-- **Primary Database**: PostgreSQL 15+ (Prisma ORM) for ACID transactional integrity
-- **Catalog Database**: MongoDB for rich, read-heavy product catalog and fast queries
-- **Cache & Locks**: Redis for distributed locking (Redlock) and rate limiting
-- **Infrastructure**: Docker Compose (Local) / AWS EKS, RDS, ElastiCache, SQS (Production)
+This platform solves the classic "Flash Sale" problem (Thundering Herd / Race Conditions) using a distributed, atomic architecture:
 
-## Core Concurrency Strategy (Zero Overselling)
+- **Distributed Locking:** Uses Redis (Upstash) and the Redlock algorithm to lock inventory instantly during the checkout flow.
+- **Atomic Database Transactions:** Uses PostgreSQL (Neon) `FOR UPDATE` row-level locks with `SERIALIZABLE` isolation to guarantee absolute consistency when writing orders.
+- **Asynchronous Processing:** Uses BullMQ workers to handle checkout expirations in the background, automatically releasing inventory if a user takes longer than 10 minutes to pay.
+- **Idempotency:** Payment webhooks (Razorpay) are strictly idempotent. Users can refresh, retry, or lose connection without ever being charged twice.
+- **Multi-Database Sync:** Hot path data (active sales) is stored in MongoDB Atlas for blazing-fast catalog reads, while transactional truth is strictly enforced in PostgreSQL.
 
-The platform guarantees that exactly one purchase succeeds when 1000+ users simultaneously attempt to buy the same single-inventory item. This is achieved via a dual-layer protection mechanism:
+## 💻 Tech Stack
 
-1.  **Redis Distributed Locking (Redlock)**: Provides fast, distributed mutual exclusion. When a user attempts to reserve an item, the API first acquires a Redis lock for that specific inventory item. This prevents concurrent requests from even hitting the database simultaneously.
-2.  **PostgreSQL Atomic Transactions (`SELECT FOR UPDATE`)**: Inside the Redis lock, a database transaction is opened with `SERIALIZABLE` isolation. The inventory row is locked using `SELECT ... FOR UPDATE`, ensuring that even if the Redis lock fails, the database guarantees atomicity. The inventory is checked and decremented in this single, protected transaction.
-3.  **Idempotency**: All critical endpoints (Reservation, Payment) require an `idempotencyKey`. The `idempotency.service.ts` ensures that if a client retries a request (e.g., due to network timeout), the exact same result is returned without re-processing the logic or decrementing inventory twice.
-4.  **State Machine & TTL**: Reservations are held in a `RESERVED` state for 10 minutes. If payment is not completed, a background BullMQ worker atomically transitions the state to `EXPIRED` and increments the available inventory.
+**Frontend:**
+- Next.js 14 (App Router)
+- React 18 & TypeScript
+- TailwindCSS (Glassmorphism UI)
+- Lucide Icons
 
-## Project Structure (pnpm Monorepo)
+**Backend & Worker:**
+- Node.js & Express
+- Prisma ORM
+- BullMQ (Message Queues)
+- Razorpay Checkout API
 
-```
-├── apps/
-│   ├── api/           # Express API Gateway (Controllers, Middleware, Cache)
-│   ├── worker/        # BullMQ Background Processors (Payments, Expiration, Webhooks)
-│   └── web/           # Next.js Frontend (React, Tailwind, Sonner)
-├── packages/
-│   ├── auth/          # Argon2id Hashing, JWT, Session Management, RBAC
-│   ├── database/      # Prisma Schema, MongoDB Models, Client Instantiation
-│   ├── shared/        # Shared Types, Constants, Error Classes, Utilities
-│   └── validation/    # Zod Schemas for Input Validation
-├── infrastructure/    # Terraform and Kubernetes manifests
-├── load-test/         # k6 Load Testing Scripts
-└── docker-compose.yml # Local multi-container environment
-```
+**Infrastructure:**
+- **Database:** Neon Serverless Postgres
+- **Catalog:** MongoDB Atlas
+- **Cache/Queue:** Upstash Redis
+- **Hosting:** Render (Backend) / Netlify (Frontend)
 
-## Getting Started (Local Development)
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 20+
 - pnpm 8+
-- Docker & Docker Compose
 
-### Setup
+### Installation
+1. Clone the repository
+   \`\`\`bash
+   git clone https://github.com/BN-sahu/High-Concurrency-Flash-Sale-E-Commerce.git
+   cd High-Concurrency-Flash-Sale-E-Commerce
+   \`\`\`
 
-1.  **Install Dependencies**:
-    ```bash
-    pnpm install
-    ```
+2. Install dependencies
+   \`\`\`bash
+   pnpm install
+   \`\`\`
 
-2.  **Start Infrastructure (PostgreSQL, MongoDB, Redis)**:
-    ```bash
-    docker-compose up -d postgres mongo redis
-    ```
+3. Set up environment variables
+   Refer to the `.env.example` files in `apps/api`, `apps/web`, and `apps/worker`. You will need connection strings for Postgres, Redis, and MongoDB.
 
-3.  **Database Migration**:
-    ```bash
-    cd packages/database
-    npx prisma db push
-    ```
+4. Run database migrations & seed
+   \`\`\`bash
+   pnpm --filter @flash-sale/database run db:push
+   npx tsx packages/database/seed.ts
+   \`\`\`
 
-4.  **Start the Platform**:
-    Start all applications (API, Worker, Web) in parallel:
-    ```bash
-    pnpm run dev
-    ```
-
-- Frontend: `http://localhost:3000`
-- API Server: `http://localhost:3001`
-- Swagger Docs: `http://localhost:3001/api/docs`
-
-## Load Testing
-
-The platform includes a `k6` script designed to simulate a flash-sale spike (1000 VUs).
-
-```bash
-k6 run load-test/flash-sale.js
-```
-
-## Production Deployment
-
-The `infrastructure/` directory contains definitions for deploying to AWS EKS:
-- `docker/`: Multi-stage Dockerfiles optimized for production size and caching.
-- `terraform/`: AWS resources (RDS Postgres, ElastiCache Redis, SQS Queues).
-- `kubernetes/`: Deployments, Services, HPA, PDB, and ALB Ingress definitions.
+5. Start the development servers
+   \`\`\`bash
+   pnpm dev
+   \`\`\`
+   *(This starts the Next.js frontend, Express API, and Background Worker simultaneously).*
