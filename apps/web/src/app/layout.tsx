@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="gradient-text font-bold">FlashDrop</span>
-                <span className="text-[var(--text-muted)] text-sm">© 2024</span>
+                <span className="text-[var(--text-muted)] text-sm">© 2026</span>
               </div>
               <div className="flex gap-6 text-sm text-[var(--text-muted)]">
                 <span>Zero Overselling Guarantee</span>
