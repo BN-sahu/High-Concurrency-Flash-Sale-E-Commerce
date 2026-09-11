@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import { RedisStore } from 'rate-limit-redis';
 import dotenv from 'dotenv';
 
 import { connectMongo } from '@flash-sale/database';
@@ -22,6 +23,7 @@ import { webhookRouter } from './payments/webhook.controller';
 import { closeRedis } from './cache/redis.service';
 import { closeQueues } from './queue/queue.service';
 import { expireReservations } from './checkout/reservation.service';
+import { getRedis } from './cache/redis.service';
 
 dotenv.config();
 
@@ -29,6 +31,9 @@ const logger = createLogger('server');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const isProduction = process.env.NODE_ENV === 'production';
+
+// Trust proxy for load balancers (Render, Netlify, Nginx)
+app.set('trust proxy', 1);
 
 // ============ Security Middleware ============
 app.use(helmet({
@@ -54,6 +59,10 @@ app.use(compression());
 
 // ============ Rate Limiting ============
 const generalLimiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args: string[]) => getRedis().call(args[0], ...args.slice(1)) as any,
+    prefix: 'rl:general:',
+  }),
   windowMs: 60 * 1000, // 1 minute
   max: 100,
   standardHeaders: true,
@@ -62,6 +71,10 @@ const generalLimiter = rateLimit({
 });
 
 const checkoutLimiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args: string[]) => getRedis().call(args[0], ...args.slice(1)) as any,
+    prefix: 'rl:checkout:',
+  }),
   windowMs: 60 * 1000,
   max: 5, // 5 checkout attempts per minute per user
   standardHeaders: true,
@@ -71,6 +84,10 @@ const checkoutLimiter = rateLimit({
 });
 
 const authLimiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args: string[]) => getRedis().call(args[0], ...args.slice(1)) as any,
+    prefix: 'rl:auth:',
+  }),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // 10 login attempts per 15 minutes
   standardHeaders: true,
