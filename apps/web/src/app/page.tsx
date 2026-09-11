@@ -65,11 +65,11 @@ export default function Home() {
     <div className="animate-fade-in">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        {/* Background Gradient Orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-[var(--primary)] opacity-10 blur-[120px]" />
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-[var(--secondary)] opacity-10 blur-[120px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[var(--accent)] opacity-5 blur-[100px]" />
+        {/* Background Gradient Orbs - Enhanced for Cyberpunk Vibe */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none mix-blend-screen">
+          <div className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-[var(--primary)] opacity-20 blur-[150px] animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute top-[20%] -left-[20%] w-[900px] h-[900px] rounded-full bg-[var(--secondary)] opacity-15 blur-[180px] animate-pulse" style={{ animationDuration: '12s' }} />
+          <div className="absolute top-[40%] left-[30%] w-[600px] h-[600px] rounded-full bg-[var(--accent)] opacity-20 blur-[160px] animate-pulse" style={{ animationDuration: '10s' }} />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
@@ -80,15 +80,16 @@ export default function Home() {
               <span className="text-sm font-semibold text-[var(--danger)]">LIVE NOW</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
-              <span className="gradient-text">Flash Drops</span>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6 leading-tight">
+              <span className="gradient-text drop-shadow-2xl">FlashDrops</span>
               <br />
-              <span className="text-[var(--foreground)]">That Never Oversell</span>
+              <span className="text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">That Never Oversell</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-[var(--text-muted)] mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-[var(--text-secondary)] mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
               Atomic transactions. Distributed locking. Enterprise-grade reliability.
-              When we say limited — we mean it.
+              <br/>
+              <span className="text-[var(--primary)] font-bold tracking-wider">WHEN WE SAY LIMITED — WE MEAN IT.</span>
             </p>
 
             {/* Countdown Timer */}
