@@ -149,6 +149,15 @@ body {
   transform: translateY(-2px);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary {
+    transition: none !important;
+  }
+  .btn-primary:hover {
+    transform: none !important;
+  }
+}
+
 /* Button styles */
 .btn-primary {
   background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
